@@ -3,7 +3,7 @@ require 'gilded_rose'
 RSpec.describe GildedRose do
   subject (:gilded_rose) { GildedRose.new(items) }
   let (:dexterity_vest) { Item.new("+5 Dexterity Vest", 10, 10) }
-  let (:elixir) { Item.new("Elixir of the Mongoose", 10, 10)}
+  let (:elixir) { Item.new("Elixir of the Mongoose", 10, 10) }
   let (:aged_brie) { Item.new("Aged Brie", 10, 10) }
   let (:sulfuras) { Item.new("Sulfuras, Hand of Ragnaros", 10, 10) }
   let (:backstage_pass) { Item.new("Backstage passes to a TAFKAL80ETC concert", 15, 10) }
@@ -60,14 +60,31 @@ RSpec.describe GildedRose do
     end
 
     it "Sulfuras sell-in date remains the same" do
-      sulfuras.sell_in = 0
       gilded_rose.update_quality
-      expect(gilded_rose.items[3].sell_in).to eq 0
+      expect(gilded_rose.items[3].sell_in).to eq 10
     end
 
     it "Sulfuras Quality never decreases" do
       gilded_rose.update_quality
       expect(gilded_rose.items[3].quality).to eq 10
+    end
+
+    it "Backstage passes increases Quality by 2 when less than 10 days of sell-in" do
+      backstage_pass.sell_in = 10
+      gilded_rose.update_quality
+      expect(gilded_rose.items[4].quality).to eq 12
+    end
+
+    it "Backstage passes increases Quality by 3 when less than 5 days of sell-in" do
+      backstage_pass.sell_in = 5
+      gilded_rose.update_quality
+      expect(gilded_rose.items[4].quality).to eq 13
+    end
+
+    it "Backstage passes Quality drops to 0 at sell-by date" do
+      backstage_pass.sell_in = 0
+      gilded_rose.update_quality
+      expect(gilded_rose.items[4].quality).to eq 0
     end
   end
 end
